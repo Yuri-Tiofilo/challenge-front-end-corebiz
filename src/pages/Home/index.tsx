@@ -18,6 +18,7 @@ import {
 } from '../../utils/formats';
 import getValidationError from '../../utils/getValidationErrors';
 import { useAuth } from '../../hooks/auth';
+import { useToast } from '../../hooks/toast';
 
 import {
   Container,
@@ -84,6 +85,7 @@ const Home: React.FC = () => {
   });
 
   const { registerUser } = useAuth();
+  const { addToast } = useToast();
 
   useEffect(() => {
     setCartSize(list.length);
@@ -136,7 +138,14 @@ const Home: React.FC = () => {
           setErrorGlobal(!!errors);
 
           formRef.current?.setErrors(errors);
+
+          return;
         }
+        addToast({
+          type: 'error',
+          title: 'Erro na authenticação',
+          description: 'Ocorreu um erro ao fazer o cadastro',
+        });
       }
     },
     [registerUser],
