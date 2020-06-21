@@ -29,6 +29,14 @@ O projeto foi desenvolvido com essas tecnologias:
 ## Resultado final
 
 <img src="assets/image1.png">
+
+<br />
+<br />
+
 <img src="assets/image2.png">
+
+<br />
+<br />
+
 <img src="assets/image3.png">
 
