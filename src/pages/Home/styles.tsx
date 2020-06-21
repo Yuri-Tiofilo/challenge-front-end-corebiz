@@ -2,7 +2,6 @@ import styled, { css } from 'styled-components';
 import { Form } from '@unform/web';
 
 import { FiStar } from 'react-icons/fi';
-import { fromString } from 'uuidv4';
 
 interface AreaButtonProps {
   isError: boolean;

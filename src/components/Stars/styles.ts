@@ -1,4 +1,4 @@
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { AiFillStar, AiOutlineStar } from 'react-icons/ai';
 
 interface PropsIconStars {

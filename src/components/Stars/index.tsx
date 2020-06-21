@@ -10,9 +10,9 @@ const Stars: React.FC<StarsProps> = ({ stars_classified }) => {
     <AreaStars>
       {[0, 1, 2, 3, 4].map((element, index) =>
         index <= stars_classified - 1 ? (
-          <IconStarsFill />
+          <IconStarsFill key={element} />
         ) : (
-          <IconStarsOutline />
+          <IconStarsOutline key={element} />
         ),
       )}
     </AreaStars>

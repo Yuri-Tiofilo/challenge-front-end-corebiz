@@ -27,22 +27,15 @@ const AuthProvider: React.FC = ({ children }) => {
 
   const registerUser = useCallback(async ({ email, name }) => {
     try {
-      const response = await api.post('/api/v1/newsletter', {
+      await api.post('/api/v1/newsletter', {
         email,
         name,
       });
 
       setSucessSignIn(true);
-
-      console.log(response);
     } catch (err) {
-      console.log(err);
       setSucessSignIn(false);
     }
-  }, []);
-
-  const setNewUser = useCallback(() => {
-    setSucessSignIn(false);
   }, []);
 
   return (

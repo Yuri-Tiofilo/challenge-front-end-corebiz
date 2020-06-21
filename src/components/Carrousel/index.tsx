@@ -22,7 +22,7 @@ const Carrousel: React.FC = () => {
 
       <ButtonScroll>
         {[1, 2, 3, 4].map((element, index) => (
-          <Circle isFilled={index === 0} />
+          <Circle isFilled={index === 0} key={element} />
         ))}
       </ButtonScroll>
     </Container>

@@ -13,10 +13,6 @@ export function currencyFormat(num: number): string {
 export function parseStringAndTransform(num: string): number {
   const newValue = num.split('0');
 
-  if (newValue[0].length === 4) {
-    return Number(newValue[0].substring(0, 4));
-  }
-
   return Number(newValue[0].substring(0, 3));
 }
 

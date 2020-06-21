@@ -12,14 +12,12 @@ import StarsComponent from '../../components/Stars';
 import api from '../../services/api';
 
 import {
-  currencyFormat,
   formatPrice,
   parseStringAndTransform,
   transformPrice,
 } from '../../utils/formats';
 import getValidationError from '../../utils/getValidationErrors';
 import { useAuth } from '../../hooks/auth';
-import { useProducts } from '../../hooks/products';
 
 import {
   Container,
@@ -29,8 +27,6 @@ import {
   AreaImage,
   Image,
   NameProduct,
-  AreaStars,
-  Stars,
   Price,
   Installments,
   ButtonBuy,
@@ -48,7 +44,6 @@ import {
   AreaRegisterSucess,
   TitleRegisterSucess,
   TitleTooltip,
-  IconStars,
 } from './styles';
 
 interface Installments {
@@ -75,19 +70,24 @@ interface Credencials {
 const Home: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const [cartSize, setCartSize] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false); // eslint-disable-line
   const [errorGlobal, setErrorGlobal] = useState<boolean>(false);
   const [sucessSignIn, setsucessSignIn] = useState<boolean>(false);
 
-  const { listCart, addToCart: addToListCart } = useProducts();
+  const [list, setList] = useState(() => {//eslint-disable-line
+    const newList = localStorage.getItem('corebiz:products');
 
-  console.log(listCart);
+    if (newList) {
+      return JSON.parse(newList);
+    }
+    return [];
+  });
 
   const { registerUser } = useAuth();
 
-  console.log(formatPrice(199));
-
-  console.log(`sucess ${sucessSignIn}`);
+  useEffect(() => {
+    setCartSize(list.length);
+  }, [list]);
 
   const [dataProducts, setDataProducts] = useState<DataProducts[]>([]);
 
@@ -100,9 +100,7 @@ const Home: React.FC = () => {
       quant: 0,
     }));
 
-    console.log(newProducts);
-
-    setDataProducts(response.data);
+    setDataProducts(newProducts);
 
     setLoading(false);
   }
@@ -111,89 +109,45 @@ const Home: React.FC = () => {
     requestProductsApi();
   }, []);
 
-  const handleSubmitPromotion = useCallback(async (data: Credencials) => {
-    try {
-      const schema = Yup.object().shape({
-        name: Yup.string().required('Preencha com seu nome completo'),
-        email: Yup.string()
-          .required('Preencha com um e-mail válido')
-          .email('Digite um e-mail valido'),
-      });
+  const handleSubmitPromotion = useCallback(
+    async (data: Credencials) => {
+      try {
+        const schema = Yup.object().shape({
+          name: Yup.string().required('Preencha com seu nome completo'),
+          email: Yup.string()
+            .required('Preencha com um e-mail válido')
+            .email('Digite um e-mail valido'),
+        });
 
-      await schema.validate(data, {
-        abortEarly: false,
-      });
+        await schema.validate(data, {
+          abortEarly: false,
+        });
 
-      await registerUser({
-        email: data.email,
-        name: data.name,
-      });
+        await registerUser({
+          email: data.email,
+          name: data.name,
+        });
 
-      setsucessSignIn(true);
-    } catch (err) {
-      if (err instanceof Yup.ValidationError) {
-        const errors = getValidationError(err);
+        setsucessSignIn(true);
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationError(err);
 
-        setErrorGlobal(!!errors);
+          setErrorGlobal(!!errors);
 
-        formRef.current?.setErrors(errors);
-      }
-    }
-  }, []);
-
-  function checkProductsExists(newList: DataProducts[]): void {
-    addToListCart(newList);
-  }
-
-  function addToCart(element: DataProducts, index: number): void {
-    const newListProducts = dataProducts.map(
-      (product, indexProduct): DataProducts => {
-        if (index === indexProduct) {
-          const {
-            productId,
-            productName,
-            stars,
-            imageUrl,
-            listPrice,
-            price,
-            installments,
-            quant,
-          } = product;
-          return {
-            productId,
-            productName,
-            stars,
-            imageUrl,
-            listPrice,
-            price,
-            installments,
-            quant: quant + 1,
-          };
+          formRef.current?.setErrors(errors);
         }
-        const {
-          productId,
-          productName,
-          stars,
-          imageUrl,
-          listPrice,
-          price,
-          installments,
-          quant,
-        } = product;
+      }
+    },
+    [registerUser],
+  );
 
-        return {
-          productId,
-          productName,
-          stars,
-          imageUrl,
-          listPrice,
-          price,
-          quant,
-          installments,
-        };
-      },
-    );
-    checkProductsExists(newListProducts);
+  function addToCart(element: DataProducts): void {
+    list.push(element);
+
+    localStorage.setItem('corebiz:products', JSON.stringify(list));
+
+    setCartSize(list.length);
   }
 
   return (
@@ -260,7 +214,7 @@ const Home: React.FC = () => {
                       )}
                     </Installments>
                   ))}
-                  <ButtonBuy onClick={() => addToCart(element, index)}>
+                  <ButtonBuy onClick={() => addToCart(element)}>
                     COMPRAR
                   </ButtonBuy>
                 </CardProduct>
